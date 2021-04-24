@@ -160,10 +160,11 @@ class HomeScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () async {
+                // this signOut function is why I need to use a ChangeNotifier.
+                // If there was a way to provide the signOut() function
                 context.read<AppState>().signOut();
-                context.router.root.push(SignInRoute(onSignedIn: (c) {
+                context.router.root.replace(SignInRoute(onSignedIn: (c) {
                   context.read<AppState>().signIn(c.username, c.password);
-                  context.router.root.pop();
                 }));
               },
               child: Text('Sign out'),
