@@ -175,6 +175,14 @@ class HomeScreen extends StatelessWidget {
                 context.router.root.replace(SignInRoute(onSignedIn: (c) {
                   context.read<AppState>().signIn(c.username, c.password);
                 }));
+
+                // I would prefer to .pushPath with `context.router.root.pushPath("/signUp")
+                // so that I don't have to duplicate the `onSignedIn callback logic`
+                //
+                // However, that shows the back button and allows popping back
+                // to the HomeScreen even though I'm now logged out
+                //
+                // If there was a .replacePath option, it would solve these problems
               },
               child: Text('Sign out'),
             ),
