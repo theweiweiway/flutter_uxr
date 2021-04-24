@@ -161,8 +161,17 @@ class HomeScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 // this signOut function is why I need to use a ChangeNotifier.
-                // If there was a way to provide the signOut() function
+                // If there was a way to expose a signOut() function on the HomeScreen,
+                // through the routing setup, I could eliminate ChangeNotifier and make
+                // this more like the Flutter_UXR examples.
                 context.read<AppState>().signOut();
+
+                // IF i did `.push` instead of `.replace`, I would be able to
+                // pop back to the HomePage even though I am now signed out.
+                // I believe is because the `Guard` does not fire when popping
+                //
+                // By using replace, it fixes this problem - however, I think
+                // it probably makes sense for the `Guard` should fire on pop
                 context.router.root.replace(SignInRoute(onSignedIn: (c) {
                   context.read<AppState>().signIn(c.username, c.password);
                 }));
