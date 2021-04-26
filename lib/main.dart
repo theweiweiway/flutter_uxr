@@ -63,7 +63,7 @@ class WishlistGuard extends AutoRouteGuard {
   @override
   Future<bool> canNavigate(
       List<PageRouteInfo> pendingRoutes, StackRouter router) async {
-    createIfNotExist("16");
+    createIfNotExist(router.currentSegments.last.params["id"]);
     return false;
   }
 }
