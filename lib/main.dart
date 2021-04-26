@@ -1,135 +1,81 @@
 // Copyright 2021, the Flutter project authors. Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-
-/// Deeplink path parameters example
+//
+/// Dynamic linking example
 /// Done using AutoRoute
+
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_uxr/main.gr.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(BooksApp());
+  runApp(WishListApp());
 }
 
-class Credentials {
-  final String username;
-  final String password;
+class Wishlist {
+  final String id;
 
-  Credentials(this.username, this.password);
-}
-
-abstract class Authentication {
-  Future<bool> isSignedIn();
-
-  Future<void> signOut();
-
-  Future<bool> signIn(String username, String password);
-}
-
-class MockAuthentication implements Authentication {
-  bool _signedIn = false;
-
-  @override
-  Future<bool> isSignedIn() async {
-    return _signedIn;
-  }
-
-  @override
-  Future<void> signOut() async {
-    _signedIn = false;
-  }
-
-  @override
-  Future<bool> signIn(String username, String password) async {
-    return _signedIn = true;
-  }
+  Wishlist(this.id);
 }
 
 class AppState extends ChangeNotifier {
-  final Authentication auth;
+  final List<Wishlist> wishlists = <Wishlist>[];
 
-  AppState(this.auth);
-
-  Future<bool> signIn(String username, String password) async {
-    var success = await auth.signIn(username, password);
-    notifyListeners();
-    return success;
-  }
-
-  Future<void> signOut() async {
-    await auth.signOut();
+  void addWishlist(Wishlist wishlist) {
+    wishlists.add(wishlist);
     notifyListeners();
   }
 }
 
 // Declare routing setup
 @MaterialAutoRouter(
-  replaceInRouteName: 'Screen,Route',
+  replaceInRouteName: 'Page,Route',
   routes: <AutoRoute>[
     AutoRoute(
       path: "/",
-      name: 'AppStack',
       page: EmptyRouterPage,
-      guards: [SignedInGuard],
       children: [
-        AutoRoute(path: "", page: HomeScreen),
-        AutoRoute(path: "books", page: BooksListScreen),
+        AutoRoute(path: "", page: WishlistListPage),
+        AutoRoute(
+            path: "wishlist/:id", guards: [WishlistGuard], page: WishlistPage),
       ],
     ),
-    AutoRoute(path: "/signIn", guards: [SignedOutGuard], page: SignInScreen),
     RedirectRoute(path: "*", redirectTo: "/")
   ],
 )
 class $AppRouter {}
 
-// Declare route guards
-class SignedOutGuard extends AutoRouteGuard {
+// Wishlist Guard
+class WishlistGuard extends AutoRouteGuard {
   final AppState appState;
-  SignedOutGuard({required this.appState});
+  WishlistGuard(this.appState);
+
+  void createIfNotExist(String value) {
+    if (appState.wishlists.indexWhere((element) => element.id == value) == -1) {
+      appState.addWishlist(Wishlist(value));
+    }
+  }
 
   @override
   Future<bool> canNavigate(
       List<PageRouteInfo> pendingRoutes, StackRouter router) async {
-    if (await appState.auth.isSignedIn()) {
-      router.root.pushPath("/");
-      return false;
-    }
-    return true;
+    createIfNotExist("16");
+    return false;
   }
 }
 
-class SignedInGuard extends AutoRouteGuard {
-  final AppState appState;
-  SignedInGuard({required this.appState});
-
+class WishListApp extends StatefulWidget {
   @override
-  Future<bool> canNavigate(
-      List<PageRouteInfo> pendingRoutes, StackRouter router) async {
-    if (!await appState.auth.isSignedIn()) {
-      router.root.push(SignInRoute(onSignedIn: (c) {
-        appState.signIn(c.username, c.password);
-        router.replaceAll(pendingRoutes);
-      }));
-      return false;
-    }
-    return true;
-  }
+  State<StatefulWidget> createState() => _WishListAppState();
 }
 
-// Main App
-class BooksApp extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _BooksAppState();
-}
-
-class _BooksAppState extends State<BooksApp> {
-  AppState _appState = AppState(MockAuthentication());
-
-  late final _appRouter = AppRouter(
-      signedOutGuard: SignedOutGuard(appState: _appState),
-      signedInGuard: SignedInGuard(appState: _appState));
+class _WishListAppState extends State<WishListApp> {
+  final AppState _appState = AppState();
+  late final _appRouter = AppRouter(wishlistGuard: WishlistGuard(_appState));
 
   @override
   Widget build(BuildContext context) {
@@ -137,125 +83,71 @@ class _BooksAppState extends State<BooksApp> {
       routeInformationParser: _appRouter.defaultRouteParser(),
       routerDelegate: _appRouter.delegate(),
       builder: (_, router) {
-        return ChangeNotifierProvider(
-          create: (_) => _appState,
-          child: router,
-        );
+        return ChangeNotifierProvider(create: (_) => _appState, child: router);
       },
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          children: [
-            ElevatedButton(
-              onPressed: () => context.router.push(BooksListRoute()),
-              child: Text('View my bookshelf'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                // this signOut function is why I need to use a ChangeNotifier.
-                // If there was a way to expose a signOut() function on the HomeScreen,
-                // through the routing setup, I could eliminate ChangeNotifier and make
-                // this more like the Flutter_UXR examples.
-                context.read<AppState>().signOut();
-
-                // IF i did `.push` instead of `.replace`, I would be able to
-                // pop back to the HomePage even though I am now signed out.
-                // I believe is because the `Guard` does not fire when popping
-                //
-                // By using replace, it fixes this problem - however, I think
-                // it probably makes sense for the `Guard` should fire on pop
-                context.router.root.replace(SignInRoute(onSignedIn: (c) {
-                  context.read<AppState>().signIn(c.username, c.password);
-                }));
-
-                // I would prefer to .pushPath with `context.router.root.pushPath("/signUp")
-                // so that I don't have to duplicate the `onSignedIn callback logic`
-                //
-                // However, that shows the back button and allows popping back
-                // to the HomeScreen even though I'm now logged out
-                //
-                // If there was a .replacePath option, it would solve these problems
-              },
-              child: Text('Sign out'),
-            ),
-          ],
-        ),
-      ),
-    );
+class WishlistListPage extends StatelessWidget {
+  void onCreate(BuildContext context, String value) {
+    final wishlist = Wishlist(value);
+    context.read<AppState>().addWishlist(wishlist);
+    context.router.pushNamed('/wishlist/$value');
   }
-}
-
-class SignInScreen extends StatefulWidget {
-  final ValueChanged<Credentials> onSignedIn;
-
-  SignInScreen({required this.onSignedIn});
-
-  @override
-  _SignInScreenState createState() => _SignInScreenState();
-}
-
-class _SignInScreenState extends State<SignInScreen> {
-  String _username = '';
-  String _password = '';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          children: [
-            TextField(
-              decoration: InputDecoration(hintText: 'username (any)'),
-              onChanged: (s) => _username = s,
-            ),
-            TextField(
-              decoration: InputDecoration(hintText: 'password (any)'),
-              obscureText: true,
-              onChanged: (s) => _password = s,
-            ),
-            ElevatedButton(
-              onPressed: () =>
-                  widget.onSignedIn(Credentials(_username, _password)),
-              child: Text('Sign in'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class BooksListScreen extends StatelessWidget {
-  BooksListScreen();
-
-  @override
-  Widget build(BuildContext context) {
+    final wishlists = context.watch<AppState>().wishlists;
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
         children: [
-          ListTile(
-            title: Text('Stranger in a Strange Land'),
-            subtitle: Text('Robert A. Heinlein'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child:
+                Text('Navigate to /wishlist/<ID> in the URL bar to dynamically '
+                    'create a new wishlist.'),
           ),
-          ListTile(
-            title: Text('Foundation'),
-            subtitle: Text('Isaac Asimov'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                var randomInt = Random().nextInt(10000);
+                onCreate(context, '$randomInt');
+              },
+              child: Text('Create a new Wishlist'),
+            ),
           ),
-          ListTile(
-            title: Text('Fahrenheit 451'),
-            subtitle: Text('Ray Bradbury'),
-          ),
+          for (var i = 0; i < wishlists.length; i++)
+            ListTile(
+              title: Text('Wishlist ${i + 1}'),
+              subtitle: Text(wishlists[i].id),
+              onTap: () =>
+                  context.router.pushNamed("/wishlist/${wishlists[i].id}"),
+            )
         ],
+      ),
+    );
+  }
+}
+
+class WishlistPage extends StatelessWidget {
+  WishlistPage({@PathParam('id') required this.id});
+  final String id;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('ID: $id', style: Theme.of(context).textTheme.headline6),
+          ],
+        ),
       ),
     );
   }

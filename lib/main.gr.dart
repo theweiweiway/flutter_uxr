@@ -5,79 +5,74 @@
 // **************************************************************************
 
 import 'package:auto_route/auto_route.dart' as _i1;
+import 'package:flutter/material.dart' as _i2;
 
-import 'main.dart' as _i2;
+import 'main.dart' as _i3;
 
 class AppRouter extends _i1.RootStackRouter {
-  AppRouter({required this.signedInGuard, required this.signedOutGuard});
+  AppRouter(
+      {_i2.GlobalKey<_i2.NavigatorState>? navigatorKey,
+      required this.wishlistGuard})
+      : super(navigatorKey);
 
-  final _i2.SignedInGuard signedInGuard;
-
-  final _i2.SignedOutGuard signedOutGuard;
+  final _i3.WishlistGuard wishlistGuard;
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
-    AppStack.name: (entry) {
-      return _i1.MaterialPageX(
-          entry: entry, child: const _i1.EmptyRouterPage());
+    EmptyRouterRoute.name: (routeData) {
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: const _i1.EmptyRouterPage());
     },
-    SignInRoute.name: (entry) {
-      var args = entry.routeData.argsAs<SignInRouteArgs>();
-      return _i1.MaterialPageX(
-          entry: entry, child: _i2.SignInScreen(onSignedIn: args.onSignedIn));
+    WishlistListRoute.name: (routeData) {
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.WishlistListPage());
     },
-    HomeRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i2.HomeScreen());
-    },
-    BooksListRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i2.BooksListScreen());
+    WishlistRoute.name: (routeData) {
+      var pathParams = routeData.pathParams;
+      final args = routeData.argsAs<WishlistRouteArgs>(
+          orElse: () => WishlistRouteArgs(id: pathParams.getString('id')));
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.WishlistPage(id: args.id));
     }
   };
 
   @override
   List<_i1.RouteConfig> get routes => [
-        _i1.RouteConfig(AppStack.name, path: '/', guards: [
-          signedInGuard
-        ], children: [
-          _i1.RouteConfig(HomeRoute.name, path: ''),
-          _i1.RouteConfig(BooksListRoute.name, path: 'books')
+        _i1.RouteConfig(EmptyRouterRoute.name, path: '/', children: [
+          _i1.RouteConfig(WishlistListRoute.name, path: ''),
+          _i1.RouteConfig(WishlistRoute.name,
+              path: 'wishlist/:id', guards: [wishlistGuard])
         ]),
-        _i1.RouteConfig(SignInRoute.name,
-            path: '/signIn', guards: [signedOutGuard]),
         _i1.RouteConfig('*#redirect',
             path: '*', redirectTo: '/', fullMatch: true)
       ];
 }
 
-class AppStack extends _i1.PageRouteInfo {
-  const AppStack({List<_i1.PageRouteInfo>? children})
-      : super(name, path: '/', initialChildren: children);
+class EmptyRouterRoute extends _i1.PageRouteInfo {
+  const EmptyRouterRoute({List<_i1.PageRouteInfo>? children})
+      : super(name, path: '/', children: children);
 
-  static const String name = 'AppStack';
+  static const String name = 'EmptyRouterRoute';
 }
 
-class SignInRoute extends _i1.PageRouteInfo<SignInRouteArgs> {
-  SignInRoute({required void Function(_i2.Credentials) onSignedIn})
+class WishlistListRoute extends _i1.PageRouteInfo {
+  const WishlistListRoute() : super(name, path: '');
+
+  static const String name = 'WishlistListRoute';
+}
+
+class WishlistRoute extends _i1.PageRouteInfo<WishlistRouteArgs> {
+  WishlistRoute({required String id})
       : super(name,
-            path: '/signIn', args: SignInRouteArgs(onSignedIn: onSignedIn));
+            path: 'wishlist/:id',
+            args: WishlistRouteArgs(id: id),
+            params: {'id': id});
 
-  static const String name = 'SignInRoute';
+  static const String name = 'WishlistRoute';
 }
 
-class SignInRouteArgs {
-  const SignInRouteArgs({required this.onSignedIn});
+class WishlistRouteArgs {
+  const WishlistRouteArgs({required this.id});
 
-  final void Function(_i2.Credentials) onSignedIn;
-}
-
-class HomeRoute extends _i1.PageRouteInfo {
-  const HomeRoute() : super(name, path: '');
-
-  static const String name = 'HomeRoute';
-}
-
-class BooksListRoute extends _i1.PageRouteInfo {
-  const BooksListRoute() : super(name, path: 'books');
-
-  static const String name = 'BooksListRoute';
+  final String id;
 }
