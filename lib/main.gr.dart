@@ -10,12 +10,8 @@ import 'package:flutter/material.dart' as _i2;
 import 'main.dart' as _i3;
 
 class AppRouter extends _i1.RootStackRouter {
-  AppRouter(
-      {_i2.GlobalKey<_i2.NavigatorState>? navigatorKey,
-      required this.wishlistGuard})
+  AppRouter([_i2.GlobalKey<_i2.NavigatorState>? navigatorKey])
       : super(navigatorKey);
-
-  final _i3.WishlistGuard wishlistGuard;
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
@@ -40,8 +36,7 @@ class AppRouter extends _i1.RootStackRouter {
   List<_i1.RouteConfig> get routes => [
         _i1.RouteConfig(EmptyRouterRoute.name, path: '/', children: [
           _i1.RouteConfig(WishlistListRoute.name, path: ''),
-          _i1.RouteConfig(WishlistRoute.name,
-              path: 'wishlist/:id', guards: [wishlistGuard])
+          _i1.RouteConfig(WishlistRoute.name, path: 'wishlist/:id')
         ]),
         _i1.RouteConfig('*#redirect',
             path: '*', redirectTo: '/', fullMatch: true)

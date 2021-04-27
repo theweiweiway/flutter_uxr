@@ -40,33 +40,13 @@ class AppState extends ChangeNotifier {
       page: EmptyRouterPage,
       children: [
         AutoRoute(path: "", page: WishlistListPage),
-        AutoRoute(
-            path: "wishlist/:id", guards: [WishlistGuard], page: WishlistPage),
+        AutoRoute(path: "wishlist/:id", page: WishlistPage),
       ],
     ),
     RedirectRoute(path: "*", redirectTo: "/")
   ],
 )
 class $AppRouter {}
-
-// Wishlist Guard
-class WishlistGuard extends AutoRouteGuard {
-  final AppState appState;
-  WishlistGuard(this.appState);
-
-  void createIfNotExist(String value) {
-    if (appState.wishlists.indexWhere((element) => element.id == value) == -1) {
-      appState.addWishlist(Wishlist(value));
-    }
-  }
-
-  @override
-  Future<bool> canNavigate(
-      List<PageRouteInfo> pendingRoutes, StackRouter router) async {
-    createIfNotExist(router.currentSegments.last.params["id"]);
-    return true;
-  }
-}
 
 class WishListApp extends StatefulWidget {
   @override
@@ -75,7 +55,7 @@ class WishListApp extends StatefulWidget {
 
 class _WishListAppState extends State<WishListApp> {
   final AppState _appState = AppState();
-  late final _appRouter = AppRouter(wishlistGuard: WishlistGuard(_appState));
+  late final _appRouter = AppRouter();
 
   @override
   Widget build(BuildContext context) {
@@ -132,9 +112,24 @@ class WishlistListPage extends StatelessWidget {
   }
 }
 
-class WishlistPage extends StatelessWidget {
+class WishlistPage extends StatefulWidget {
   WishlistPage({@PathParam('id') required this.id});
   final String id;
+
+  @override
+  _WishlistPageState createState() => _WishlistPageState();
+}
+
+class _WishlistPageState extends State<WishlistPage> {
+  @override
+  void initState() {
+    final _appState = context.read<AppState>();
+    if (_appState.wishlists.indexWhere((element) => element.id == widget.id) ==
+        -1) {
+      _appState.addWishlist(Wishlist(widget.id));
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +140,8 @@ class WishlistPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ID: $id', style: Theme.of(context).textTheme.headline6),
+            Text('ID: ${widget.id}',
+                style: Theme.of(context).textTheme.headline6),
           ],
         ),
       ),
