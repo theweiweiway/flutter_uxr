@@ -64,7 +64,7 @@ class WishlistGuard extends AutoRouteGuard {
   Future<bool> canNavigate(
       List<PageRouteInfo> pendingRoutes, StackRouter router) async {
     createIfNotExist(router.currentSegments.last.params["id"]);
-    return false;
+    return true;
   }
 }
 
@@ -93,7 +93,7 @@ class WishlistListPage extends StatelessWidget {
   void onCreate(BuildContext context, String value) {
     final wishlist = Wishlist(value);
     context.read<AppState>().addWishlist(wishlist);
-    context.router.pushNamed('/wishlist/$value');
+    context.router.navigateNamed('/wishlist/$value');
   }
 
   @override
@@ -124,7 +124,7 @@ class WishlistListPage extends StatelessWidget {
               title: Text('Wishlist ${i + 1}'),
               subtitle: Text(wishlists[i].id),
               onTap: () =>
-                  context.router.pushNamed("/wishlist/${wishlists[i].id}"),
+                  context.router.navigateNamed("/wishlist/${wishlists[i].id}"),
             )
         ],
       ),
