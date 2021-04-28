@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-/// Deeplink path parameters example
+/// Nested example
 /// Done using AutoRoute
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
@@ -12,86 +12,160 @@ void main() {
   runApp(BooksApp());
 }
 
-final List<Book> books = [
-  Book('Stranger in a Strange Land', 'Robert A. Heinlein'),
-  Book('Foundation', 'Isaac Asimov'),
-  Book('Fahrenheit 451', 'Ray Bradbury'),
-];
-
-class Book {
-  final String title;
-  final String author;
-
-  Book(this.title, this.author);
-}
-
-// Declare routing setup
-@MaterialAutoRouter(
-  replaceInRouteName: 'Screen,Route',
-  routes: <AutoRoute>[
-    AutoRoute(path: "/", page: BooksListScreen),
-    AutoRoute(path: "/book/:id", page: BookDetailsScreen),
-    RedirectRoute(path: "*", redirectTo: "/")
-  ],
-)
-class $AppRouter {}
-
 class BooksApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final _appRouter = AppRouter();
-
-    return MaterialApp.router(
-      routerDelegate: _appRouter.delegate(),
-      routeInformationParser: _appRouter.defaultRouteParser(),
+    return VRouter(
+      initialUrl: '/books/all',
+      routes: [
+        VNester(
+          path: null,
+          widgetBuilder: (child) => AppScreen(child: child),
+          nestedRoutes: [
+            VWidget(
+              path: '/books/all',
+              aliases: ['/books/new'],
+              // We don't want an animation between path and alias so we use a constant key
+              key: ValueKey('books'),
+              widget: Builder(
+                builder: (context) => BooksScreen(
+                  initialSelectedTab:
+                      context.vRouter.url!.contains('/new') ? 0 : 1,
+                ),
+              ),
+              buildTransition: (animation, _, child) =>
+                  FadeTransition(opacity: animation, child: child),
+            ),
+            VWidget(
+              path: '/settings',
+              widget: SettingsScreen(),
+              buildTransition: (animation, _, child) =>
+                  FadeTransition(opacity: animation, child: child),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
 
-class BooksListScreen extends StatefulWidget {
-  @override
-  _BooksListScreenState createState() => _BooksListScreenState();
-}
+class AppScreen extends StatelessWidget {
+  final Widget child;
 
-class _BooksListScreenState extends State<BooksListScreen> {
+  const AppScreen({Key? key, required this.child}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: ListView(
+    return AutoTabsScaffold(
+      routes: [],
+      bottomNavigationBuilder: (_, tabsRouter) {
+        BottomNavigationBar(
+          currentIndex: context.tabsRouter.activeIndex,
+          onTap: (idx) => context.tabsRouter.setActiveIndex(idx),
+          items: [
+            BottomNavigationBarItem(
+              label: 'Books',
+              icon: Icon(Icons.chrome_reader_mode_outlined),
+            ),
+            BottomNavigationBarItem(
+              label: 'Settings',
+              icon: Icon(Icons.settings),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class BooksScreen extends StatefulWidget {
+  final int initialSelectedTab;
+
+  BooksScreen({
+    Key? key,
+    required this.initialSelectedTab,
+  }) : super(key: key);
+
+  @override
+  _BooksScreenState createState() => _BooksScreenState();
+}
+
+class _BooksScreenState extends State<BooksScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    _tabController = TabController(
+        length: 2, vsync: this, initialIndex: widget.initialSelectedTab);
+    super.initState();
+  }
+
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return VWidgetGuard(
+      beforeUpdate: (vRedirector) async => _tabController
+          .animateTo(vRedirector.newVRouterData!.url!.contains('/new') ? 0 : 1),
+      child: Column(
         children: [
-          for (var book in books)
-            ListTile(
-              title: Text(book.title),
-              subtitle: Text(book.author),
-              onTap: () =>
-                  context.router.replaceNamed("/book/${books.indexOf(book)}"),
-            )
+          TabBar(
+            controller: _tabController,
+            onTap: (int index) =>
+                context.vRouter.push(index == 1 ? '/books/all' : '/books/new'),
+            labelColor: Theme.of(context).primaryColor,
+            tabs: [
+              Tab(icon: Icon(Icons.bathtub), text: 'New'),
+              Tab(icon: Icon(Icons.group), text: 'All'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                NewBooksScreen(),
+                AllBooksScreen(),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class BookDetailsScreen extends StatelessWidget {
-  final int id;
-
-  BookDetailsScreen({@PathParam('id') required this.id});
-
+class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(books[id].title, style: Theme.of(context).textTheme.headline6),
-            Text(books[id].author,
-                style: Theme.of(context).textTheme.subtitle1),
-          ],
-        ),
+      body: Center(
+        child: Text('Settings'),
+      ),
+    );
+  }
+}
+
+class AllBooksScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text('All Books'),
+      ),
+    );
+  }
+}
+
+class NewBooksScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text('New Books'),
       ),
     );
   }
