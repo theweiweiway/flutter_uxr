@@ -15,17 +15,13 @@ class AppRouter extends _i1.RootStackRouter {
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
-    EmptyRouterRoute.name: (routeData) {
+    AppRoute.name: (routeData) {
       return _i1.CustomPage<dynamic>(
           routeData: routeData,
-          child: const _i1.EmptyRouterPage(),
+          child: _i3.AppPage(),
           transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
           opaque: true,
           barrierDismissible: false);
-    },
-    AppRoute.name: (routeData) {
-      return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.AppPage());
     },
     BooksTab.name: (routeData) {
       final args =
@@ -55,32 +51,23 @@ class AppRouter extends _i1.RootStackRouter {
 
   @override
   List<_i1.RouteConfig> get routes => [
-        _i1.RouteConfig(EmptyRouterRoute.name, path: '/', children: [
-          _i1.RouteConfig(AppRoute.name, path: '', children: [
-            _i1.RouteConfig(BooksTab.name, path: 'books', children: [
-              _i1.RouteConfig('#redirect',
-                  path: '', redirectTo: 'all', fullMatch: true),
-              _i1.RouteConfig(AllBooksRoute.name, path: 'all'),
-              _i1.RouteConfig(NewBooksRoute.name, path: 'new')
-            ]),
-            _i1.RouteConfig(SettingsTab.name, path: 'settings')
-          ])
+        _i1.RouteConfig(AppRoute.name, path: '/', children: [
+          _i1.RouteConfig(BooksTab.name, path: 'books', children: [
+            _i1.RouteConfig('#redirect',
+                path: '', redirectTo: 'all', fullMatch: true),
+            _i1.RouteConfig(AllBooksRoute.name, path: 'all'),
+            _i1.RouteConfig(NewBooksRoute.name, path: 'new')
+          ]),
+          _i1.RouteConfig(SettingsTab.name, path: 'settings')
         ]),
         _i1.RouteConfig('*#redirect',
             path: '*', redirectTo: '/', fullMatch: true)
       ];
 }
 
-class EmptyRouterRoute extends _i1.PageRouteInfo {
-  const EmptyRouterRoute({List<_i1.PageRouteInfo>? children})
-      : super(name, path: '/', children: children);
-
-  static const String name = 'EmptyRouterRoute';
-}
-
 class AppRoute extends _i1.PageRouteInfo {
   const AppRoute({List<_i1.PageRouteInfo>? children})
-      : super(name, path: '', children: children);
+      : super(name, path: '/', children: children);
 
   static const String name = 'AppRoute';
 }

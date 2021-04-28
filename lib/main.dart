@@ -18,32 +18,30 @@ void main() {
   routes: <AutoRoute>[
     CustomRoute(
       transitionsBuilder: TransitionsBuilders.fadeIn, // cross fade between tabs
-      page: EmptyRouterPage,
+      page: AppPage,
       path: "/",
       children: [
-        AutoRoute(path: "", page: AppPage, children: [
-          AutoRoute(
-            name: "BooksTab",
-            path: 'books',
-            page: BooksPage,
-            children: [
-              RedirectRoute(path: "", redirectTo: "all"),
-              CustomRoute(
-                path: "all",
-                page: AllBooksPage,
-              ),
-              CustomRoute(
-                path: "new",
-                page: NewBooksPage,
-              ),
-            ],
-          ),
-          AutoRoute(
-            name: "SettingsTab",
-            path: 'settings',
-            page: SettingsPage,
-          ),
-        ]),
+        AutoRoute(
+          name: "BooksTab",
+          path: 'books',
+          page: BooksPage,
+          children: [
+            RedirectRoute(path: "", redirectTo: "all"),
+            CustomRoute(
+              path: "all",
+              page: AllBooksPage,
+            ),
+            CustomRoute(
+              path: "new",
+              page: NewBooksPage,
+            ),
+          ],
+        ),
+        AutoRoute(
+          name: "SettingsTab",
+          path: 'settings',
+          page: SettingsPage,
+        ),
       ],
     ),
     RedirectRoute(path: "*", redirectTo: "/")
