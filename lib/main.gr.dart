@@ -1,0 +1,118 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+// **************************************************************************
+// AutoRouteGenerator
+// **************************************************************************
+
+import 'package:auto_route/auto_route.dart' as _i1;
+import 'package:flutter/material.dart' as _i2;
+
+import 'main.dart' as _i3;
+
+class AppRouter extends _i1.RootStackRouter {
+  AppRouter([_i2.GlobalKey<_i2.NavigatorState>? navigatorKey])
+      : super(navigatorKey);
+
+  @override
+  final Map<String, _i1.PageFactory> pagesMap = {
+    EmptyRouterRoute.name: (routeData) {
+      return _i1.CustomPage<dynamic>(
+          routeData: routeData,
+          child: const _i1.EmptyRouterPage(),
+          transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
+          opaque: true,
+          barrierDismissible: false);
+    },
+    AppRoute.name: (routeData) {
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.AppPage());
+    },
+    BooksTab.name: (routeData) {
+      final args =
+          routeData.argsAs<BooksTabArgs>(orElse: () => const BooksTabArgs());
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.BooksPage(key: args.key));
+    },
+    SettingsTab.name: (routeData) {
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.SettingsPage());
+    },
+    AllBooksRoute.name: (routeData) {
+      return _i1.CustomPage<dynamic>(
+          routeData: routeData,
+          child: _i3.AllBooksPage(),
+          opaque: true,
+          barrierDismissible: false);
+    },
+    NewBooksRoute.name: (routeData) {
+      return _i1.CustomPage<dynamic>(
+          routeData: routeData,
+          child: _i3.NewBooksPage(),
+          opaque: true,
+          barrierDismissible: false);
+    }
+  };
+
+  @override
+  List<_i1.RouteConfig> get routes => [
+        _i1.RouteConfig(EmptyRouterRoute.name, path: '/', children: [
+          _i1.RouteConfig(AppRoute.name, path: '', children: [
+            _i1.RouteConfig(BooksTab.name, path: 'books', children: [
+              _i1.RouteConfig('#redirect',
+                  path: '', redirectTo: 'all', fullMatch: true),
+              _i1.RouteConfig(AllBooksRoute.name, path: 'all'),
+              _i1.RouteConfig(NewBooksRoute.name, path: 'new')
+            ]),
+            _i1.RouteConfig(SettingsTab.name, path: 'settings')
+          ])
+        ]),
+        _i1.RouteConfig('*#redirect',
+            path: '*', redirectTo: '/', fullMatch: true)
+      ];
+}
+
+class EmptyRouterRoute extends _i1.PageRouteInfo {
+  const EmptyRouterRoute({List<_i1.PageRouteInfo>? children})
+      : super(name, path: '/', children: children);
+
+  static const String name = 'EmptyRouterRoute';
+}
+
+class AppRoute extends _i1.PageRouteInfo {
+  const AppRoute({List<_i1.PageRouteInfo>? children})
+      : super(name, path: '', children: children);
+
+  static const String name = 'AppRoute';
+}
+
+class BooksTab extends _i1.PageRouteInfo<BooksTabArgs> {
+  BooksTab({_i2.Key? key, List<_i1.PageRouteInfo>? children})
+      : super(name,
+            path: 'books', args: BooksTabArgs(key: key), children: children);
+
+  static const String name = 'BooksTab';
+}
+
+class BooksTabArgs {
+  const BooksTabArgs({this.key});
+
+  final _i2.Key? key;
+}
+
+class SettingsTab extends _i1.PageRouteInfo {
+  const SettingsTab() : super(name, path: 'settings');
+
+  static const String name = 'SettingsTab';
+}
+
+class AllBooksRoute extends _i1.PageRouteInfo {
+  const AllBooksRoute() : super(name, path: 'all');
+
+  static const String name = 'AllBooksRoute';
+}
+
+class NewBooksRoute extends _i1.PageRouteInfo {
+  const NewBooksRoute() : super(name, path: 'new');
+
+  static const String name = 'NewBooksRoute';
+}

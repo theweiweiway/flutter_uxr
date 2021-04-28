@@ -12,56 +12,66 @@ void main() {
   runApp(BooksApp());
 }
 
+// Declare routing setup
+@MaterialAutoRouter(
+  replaceInRouteName: 'Page,Route',
+  routes: <AutoRoute>[
+    CustomRoute(
+      transitionsBuilder: TransitionsBuilders.fadeIn, // cross fade between tabs
+      page: EmptyRouterPage,
+      path: "/",
+      children: [
+        AutoRoute(path: "", page: AppPage, children: [
+          AutoRoute(
+            name: "BooksTab",
+            path: 'books',
+            page: BooksPage,
+            children: [
+              RedirectRoute(path: "", redirectTo: "all"),
+              CustomRoute(
+                path: "all",
+                page: AllBooksPage,
+              ),
+              CustomRoute(
+                path: "new",
+                page: NewBooksPage,
+              ),
+            ],
+          ),
+          AutoRoute(
+            name: "SettingsTab",
+            path: 'settings',
+            page: SettingsPage,
+          ),
+        ]),
+      ],
+    ),
+    RedirectRoute(path: "*", redirectTo: "/")
+  ],
+)
+class $AppRouter {}
+
 class BooksApp extends StatelessWidget {
+  final _appRouter = AppRouter();
+
   @override
   Widget build(BuildContext context) {
-    return VRouter(
-      initialUrl: '/books/all',
-      routes: [
-        VNester(
-          path: null,
-          widgetBuilder: (child) => AppScreen(child: child),
-          nestedRoutes: [
-            VWidget(
-              path: '/books/all',
-              aliases: ['/books/new'],
-              // We don't want an animation between path and alias so we use a constant key
-              key: ValueKey('books'),
-              widget: Builder(
-                builder: (context) => BooksScreen(
-                  initialSelectedTab:
-                      context.vRouter.url!.contains('/new') ? 0 : 1,
-                ),
-              ),
-              buildTransition: (animation, _, child) =>
-                  FadeTransition(opacity: animation, child: child),
-            ),
-            VWidget(
-              path: '/settings',
-              widget: SettingsScreen(),
-              buildTransition: (animation, _, child) =>
-                  FadeTransition(opacity: animation, child: child),
-            ),
-          ],
-        ),
-      ],
+    return MaterialApp.router(
+      routeInformationParser: _appRouter.defaultRouteParser(),
+      routerDelegate: _appRouter.delegate(),
     );
   }
 }
 
-class AppScreen extends StatelessWidget {
-  final Widget child;
-
-  const AppScreen({Key? key, required this.child}) : super(key: key);
-
+class AppPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AutoTabsScaffold(
-      routes: [],
+      routes: [BooksTab(), SettingsTab()],
       bottomNavigationBuilder: (_, tabsRouter) {
-        BottomNavigationBar(
-          currentIndex: context.tabsRouter.activeIndex,
-          onTap: (idx) => context.tabsRouter.setActiveIndex(idx),
+        return BottomNavigationBar(
+          currentIndex: tabsRouter.activeIndex,
+          onTap: (idx) => tabsRouter.setActiveIndex(idx),
           items: [
             BottomNavigationBarItem(
               label: 'Books',
@@ -78,26 +88,22 @@ class AppScreen extends StatelessWidget {
   }
 }
 
-class BooksScreen extends StatefulWidget {
-  final int initialSelectedTab;
-
-  BooksScreen({
+class BooksPage extends StatefulWidget {
+  BooksPage({
     Key? key,
-    required this.initialSelectedTab,
   }) : super(key: key);
 
   @override
-  _BooksScreenState createState() => _BooksScreenState();
+  _BooksPageState createState() => _BooksPageState();
 }
 
-class _BooksScreenState extends State<BooksScreen>
+class _BooksPageState extends State<BooksPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
   @override
   void initState() {
-    _tabController = TabController(
-        length: 2, vsync: this, initialIndex: widget.initialSelectedTab);
+    _tabController = TabController(length: 2, vsync: this, initialIndex: 0);
     super.initState();
   }
 
@@ -108,37 +114,35 @@ class _BooksScreenState extends State<BooksScreen>
 
   @override
   Widget build(BuildContext context) {
-    return VWidgetGuard(
-      beforeUpdate: (vRedirector) async => _tabController
-          .animateTo(vRedirector.newVRouterData!.url!.contains('/new') ? 0 : 1),
-      child: Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            onTap: (int index) =>
-                context.vRouter.push(index == 1 ? '/books/all' : '/books/new'),
-            labelColor: Theme.of(context).primaryColor,
-            tabs: [
-              Tab(icon: Icon(Icons.bathtub), text: 'New'),
-              Tab(icon: Icon(Icons.group), text: 'All'),
-            ],
+    return Column(
+      children: [
+        TabBar(
+          controller: _tabController,
+          onTap: (int index) => setState(() {
+            _tabController.index = index;
+          }),
+          labelColor: Theme.of(context).primaryColor,
+          tabs: [
+            Tab(icon: Icon(Icons.bathtub), text: 'New'),
+            Tab(icon: Icon(Icons.group), text: 'All'),
+          ],
+        ),
+        Expanded(
+          child: AutoRouter.declarative(
+            routes: (context) {
+              return [
+                if (_tabController.index == 0) NewBooksRoute(),
+                if (_tabController.index == 1) AllBooksRoute(),
+              ];
+            },
           ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                NewBooksScreen(),
-                AllBooksScreen(),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-class SettingsScreen extends StatelessWidget {
+class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,7 +153,7 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-class AllBooksScreen extends StatelessWidget {
+class AllBooksPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,7 +164,7 @@ class AllBooksScreen extends StatelessWidget {
   }
 }
 
-class NewBooksScreen extends StatelessWidget {
+class NewBooksPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
