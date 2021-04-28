@@ -61,7 +61,8 @@ class BooksListScreen extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'filter',
             ),
-            onSubmitted: (value) => context.router.pushPath('/?filter=$value'),
+            onSubmitted: (value) =>
+                context.router.navigateNamed('/?filter=$value'),
           ),
           for (var book in books)
             if (filter == null || book.title.toLowerCase().contains(filter!))
