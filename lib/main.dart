@@ -48,13 +48,14 @@ class AppState extends ChangeNotifier {
 )
 class $AppRouter {}
 
+final AppState appState = AppState();
+
 class WishListApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _WishListAppState();
 }
 
 class _WishListAppState extends State<WishListApp> {
-  final AppState _appState = AppState();
   late final _appRouter = AppRouter();
 
   @override
@@ -62,9 +63,6 @@ class _WishListAppState extends State<WishListApp> {
     return MaterialApp.router(
       routeInformationParser: _appRouter.defaultRouteParser(),
       routerDelegate: _appRouter.delegate(),
-      builder: (_, router) {
-        return ChangeNotifierProvider(create: (_) => _appState, child: router);
-      },
     );
   }
 }
@@ -72,13 +70,12 @@ class _WishListAppState extends State<WishListApp> {
 class WishlistListPage extends StatelessWidget {
   void onCreate(BuildContext context, String value) {
     final wishlist = Wishlist(value);
-    context.read<AppState>().addWishlist(wishlist);
+    appState.addWishlist(wishlist);
     context.router.navigateNamed('/wishlist/$value');
   }
 
   @override
   Widget build(BuildContext context) {
-    final wishlists = context.watch<AppState>().wishlists;
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
@@ -99,12 +96,12 @@ class WishlistListPage extends StatelessWidget {
               child: Text('Create a new Wishlist'),
             ),
           ),
-          for (var i = 0; i < wishlists.length; i++)
+          for (var i = 0; i < appState.wishlists.length; i++)
             ListTile(
               title: Text('Wishlist ${i + 1}'),
-              subtitle: Text(wishlists[i].id),
-              onTap: () =>
-                  context.router.navigateNamed("/wishlist/${wishlists[i].id}"),
+              subtitle: Text(appState.wishlists[i].id),
+              onTap: () => context.router
+                  .navigateNamed("/wishlist/${appState.wishlists[i].id}"),
             )
         ],
       ),
@@ -123,12 +120,15 @@ class WishlistPage extends StatefulWidget {
 class _WishlistPageState extends State<WishlistPage> {
   @override
   void initState() {
-    final _appState = context.read<AppState>();
-    if (_appState.wishlists.indexWhere((element) => element.id == widget.id) ==
-        -1) {
-      _appState.addWishlist(Wishlist(widget.id));
-    }
+    createIfNotExist();
     super.initState();
+  }
+
+  void createIfNotExist() {
+    if (appState.wishlists.indexWhere((element) => element.id == widget.id) ==
+        -1) {
+      appState.addWishlist(Wishlist(widget.id));
+    }
   }
 
   @override
