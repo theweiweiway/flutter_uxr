@@ -5,23 +5,26 @@
 // **************************************************************************
 
 import 'package:auto_route/auto_route.dart' as _i1;
+import 'package:flutter/material.dart' as _i2;
 
-import 'main.dart' as _i2;
+import 'main.dart' as _i3;
 
 class AppRouter extends _i1.RootStackRouter {
-  AppRouter();
+  AppRouter([_i2.GlobalKey<_i2.NavigatorState>? navigatorKey])
+      : super(navigatorKey);
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
-    BooksListRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i2.BooksListScreen());
+    BooksListRoute.name: (routeData) {
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.BooksListScreen());
     },
-    BookDetailsRoute.name: (entry) {
-      var pathParams = entry.routeData.pathParams;
-      var args = entry.routeData.argsAs<BookDetailsRouteArgs>(
+    BookDetailsRoute.name: (routeData) {
+      var pathParams = routeData.pathParams;
+      final args = routeData.argsAs<BookDetailsRouteArgs>(
           orElse: () => BookDetailsRouteArgs(id: pathParams.getInt('id')));
-      return _i1.MaterialPageX(
-          entry: entry, child: _i2.BookDetailsScreen(id: args.id));
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.BookDetailsScreen(id: args.id));
     }
   };
 

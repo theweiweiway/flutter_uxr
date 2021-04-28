@@ -64,8 +64,8 @@ class _BooksListScreenState extends State<BooksListScreen> {
             ListTile(
               title: Text(book.title),
               subtitle: Text(book.author),
-              onTap: () => context.router
-                  .replace(BookDetailsRoute(id: books.indexOf(book))),
+              onTap: () =>
+                  context.router.replaceNamed("/book/${books.indexOf(book)}"),
             )
         ],
       ),
