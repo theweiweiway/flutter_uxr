@@ -24,10 +24,8 @@ class AppRouter extends _i1.RootStackRouter {
           barrierDismissible: false);
     },
     BooksTab.name: (routeData) {
-      final args =
-          routeData.argsAs<BooksTabArgs>(orElse: () => const BooksTabArgs());
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.BooksPage(key: args.key));
+          routeData: routeData, child: _i3.BooksPage());
     },
     SettingsTab.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
@@ -72,18 +70,11 @@ class AppRoute extends _i1.PageRouteInfo {
   static const String name = 'AppRoute';
 }
 
-class BooksTab extends _i1.PageRouteInfo<BooksTabArgs> {
-  BooksTab({_i2.Key? key, List<_i1.PageRouteInfo>? children})
-      : super(name,
-            path: 'books', args: BooksTabArgs(key: key), children: children);
+class BooksTab extends _i1.PageRouteInfo {
+  const BooksTab({List<_i1.PageRouteInfo>? children})
+      : super(name, path: 'books', children: children);
 
   static const String name = 'BooksTab';
-}
-
-class BooksTabArgs {
-  const BooksTabArgs({this.key});
-
-  final _i2.Key? key;
 }
 
 class SettingsTab extends _i1.PageRouteInfo {

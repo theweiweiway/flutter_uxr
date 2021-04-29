@@ -87,10 +87,6 @@ class AppPage extends StatelessWidget {
 }
 
 class BooksPage extends StatefulWidget {
-  BooksPage({
-    Key? key,
-  }) : super(key: key);
-
   @override
   _BooksPageState createState() => _BooksPageState();
 }
@@ -101,7 +97,7 @@ class _BooksPageState extends State<BooksPage>
 
   @override
   void initState() {
-    _tabController = TabController(length: 2, vsync: this, initialIndex: 0);
+    _tabController = TabController(length: 2, vsync: this, initialIndex: 1);
     super.initState();
   }
 
