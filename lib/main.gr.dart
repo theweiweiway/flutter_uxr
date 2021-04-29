@@ -15,82 +15,100 @@ class AppRouter extends _i1.RootStackRouter {
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
-    AppRoute.name: (routeData) {
-      return _i1.CustomPage<dynamic>(
-          routeData: routeData,
-          child: _i3.AppPage(),
-          transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
-          opaque: true,
-          barrierDismissible: false);
-    },
-    BooksTab.name: (routeData) {
+    RootRouter.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.BooksPage());
+          routeData: routeData, child: const _i1.EmptyRouterPage());
     },
-    SettingsTab.name: (routeData) {
+    BooksListRoute.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.SettingsPage());
+          routeData: routeData, child: _i3.BooksListPage());
     },
-    AllBooksRoute.name: (routeData) {
-      return _i1.CustomPage<dynamic>(
+    BookDetailsRoute.name: (routeData) {
+      var pathParams = routeData.pathParams;
+      final args = routeData.argsAs<BookDetailsRouteArgs>(
+          orElse: () =>
+              BookDetailsRouteArgs(bookId: pathParams.getInt('bookId')));
+      return _i1.MaterialPageX<dynamic>(
           routeData: routeData,
-          child: _i3.AllBooksPage(),
-          opaque: true,
-          barrierDismissible: false);
+          child: _i3.BookDetailsPage(bookId: args.bookId));
     },
-    NewBooksRoute.name: (routeData) {
-      return _i1.CustomPage<dynamic>(
+    AuthorsListRoute.name: (routeData) {
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.AuthorsListPage());
+    },
+    AuthorDetailsRoute.name: (routeData) {
+      var pathParams = routeData.pathParams;
+      final args = routeData.argsAs<AuthorDetailsRouteArgs>(
+          orElse: () =>
+              AuthorDetailsRouteArgs(bookId: pathParams.getInt('bookId')));
+      return _i1.MaterialPageX<dynamic>(
           routeData: routeData,
-          child: _i3.NewBooksPage(),
-          opaque: true,
-          barrierDismissible: false);
+          child: _i3.AuthorDetailsPage(bookId: args.bookId));
     }
   };
 
   @override
   List<_i1.RouteConfig> get routes => [
-        _i1.RouteConfig(AppRoute.name, path: '/', children: [
-          _i1.RouteConfig(BooksTab.name, path: 'books', children: [
-            _i1.RouteConfig('#redirect',
-                path: '', redirectTo: 'all', fullMatch: true),
-            _i1.RouteConfig(AllBooksRoute.name, path: 'all'),
-            _i1.RouteConfig(NewBooksRoute.name, path: 'new')
-          ]),
-          _i1.RouteConfig(SettingsTab.name, path: 'settings')
+        _i1.RouteConfig(RootRouter.name, path: '/', children: [
+          _i1.RouteConfig('#redirect',
+              path: '', redirectTo: 'books', fullMatch: true),
+          _i1.RouteConfig(BooksListRoute.name, path: 'books'),
+          _i1.RouteConfig(BookDetailsRoute.name, path: 'book/:bookId'),
+          _i1.RouteConfig(AuthorsListRoute.name, path: 'authors'),
+          _i1.RouteConfig(AuthorDetailsRoute.name, path: 'author/:bookId')
         ]),
         _i1.RouteConfig('*#redirect',
-            path: '*', redirectTo: '/', fullMatch: true)
+            path: '*', redirectTo: '/ ', fullMatch: true)
       ];
 }
 
-class AppRoute extends _i1.PageRouteInfo {
-  const AppRoute({List<_i1.PageRouteInfo>? children})
+class RootRouter extends _i1.PageRouteInfo {
+  const RootRouter({List<_i1.PageRouteInfo>? children})
       : super(name, path: '/', children: children);
 
-  static const String name = 'AppRoute';
+  static const String name = 'RootRouter';
 }
 
-class BooksTab extends _i1.PageRouteInfo {
-  const BooksTab({List<_i1.PageRouteInfo>? children})
-      : super(name, path: 'books', children: children);
+class BooksListRoute extends _i1.PageRouteInfo {
+  const BooksListRoute() : super(name, path: 'books');
 
-  static const String name = 'BooksTab';
+  static const String name = 'BooksListRoute';
 }
 
-class SettingsTab extends _i1.PageRouteInfo {
-  const SettingsTab() : super(name, path: 'settings');
+class BookDetailsRoute extends _i1.PageRouteInfo<BookDetailsRouteArgs> {
+  BookDetailsRoute({required int bookId})
+      : super(name,
+            path: 'book/:bookId',
+            args: BookDetailsRouteArgs(bookId: bookId),
+            params: {'bookId': bookId});
 
-  static const String name = 'SettingsTab';
+  static const String name = 'BookDetailsRoute';
 }
 
-class AllBooksRoute extends _i1.PageRouteInfo {
-  const AllBooksRoute() : super(name, path: 'all');
+class BookDetailsRouteArgs {
+  const BookDetailsRouteArgs({required this.bookId});
 
-  static const String name = 'AllBooksRoute';
+  final int bookId;
 }
 
-class NewBooksRoute extends _i1.PageRouteInfo {
-  const NewBooksRoute() : super(name, path: 'new');
+class AuthorsListRoute extends _i1.PageRouteInfo {
+  const AuthorsListRoute() : super(name, path: 'authors');
 
-  static const String name = 'NewBooksRoute';
+  static const String name = 'AuthorsListRoute';
+}
+
+class AuthorDetailsRoute extends _i1.PageRouteInfo<AuthorDetailsRouteArgs> {
+  AuthorDetailsRoute({required int bookId})
+      : super(name,
+            path: 'author/:bookId',
+            args: AuthorDetailsRouteArgs(bookId: bookId),
+            params: {'bookId': bookId});
+
+  static const String name = 'AuthorDetailsRoute';
+}
+
+class AuthorDetailsRouteArgs {
+  const AuthorDetailsRouteArgs({required this.bookId});
+
+  final int bookId;
 }

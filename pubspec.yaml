@@ -24,6 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   auto_route: ^2.0.1
+  vrouter: ^1.1.1+2
 
 
   # The following adds the Cupertino Icons font to your application.
