@@ -122,6 +122,7 @@ class _BooksPageState extends State<BooksPage>
           ],
         ),
         Expanded(
+          // DECLARATIVE FTW!!!
           child: AutoRouter.declarative(
             routes: (context) {
               return [
