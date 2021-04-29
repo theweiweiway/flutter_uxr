@@ -10,48 +10,40 @@ import 'package:flutter/material.dart' as _i2;
 import 'main.dart' as _i3;
 
 class AppRouter extends _i1.RootStackRouter {
-  AppRouter([_i2.GlobalKey<_i2.NavigatorState>? navigatorKey])
+  AppRouter(
+      {_i2.GlobalKey<_i2.NavigatorState>? navigatorKey,
+      required this.createIfNotExistGuard})
       : super(navigatorKey);
+
+  final _i3.CreateIfNotExistGuard createIfNotExistGuard;
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
-    EmptyRouterRoute.name: (routeData) {
-      return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: const _i1.EmptyRouterPage());
-    },
     WishlistListRoute.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.WishlistListPage());
+          routeData: routeData, child: _i3.WishlistListScreen());
     },
     WishlistRoute.name: (routeData) {
       var pathParams = routeData.pathParams;
       final args = routeData.argsAs<WishlistRouteArgs>(
           orElse: () => WishlistRouteArgs(id: pathParams.getString('id')));
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.WishlistPage(id: args.id));
+          routeData: routeData, child: _i3.WishlistScreen(id: args.id));
     }
   };
 
   @override
   List<_i1.RouteConfig> get routes => [
-        _i1.RouteConfig(EmptyRouterRoute.name, path: '/', children: [
-          _i1.RouteConfig(WishlistListRoute.name, path: ''),
-          _i1.RouteConfig(WishlistRoute.name, path: 'wishlist/:id')
-        ]),
+        _i1.RouteConfig(WishlistListRoute.name, path: '/'),
+        _i1.RouteConfig(WishlistRoute.name,
+            path: '/wishlist/:id', guards: [createIfNotExistGuard]),
         _i1.RouteConfig('*#redirect',
             path: '*', redirectTo: '/', fullMatch: true)
       ];
 }
 
-class EmptyRouterRoute extends _i1.PageRouteInfo {
-  const EmptyRouterRoute({List<_i1.PageRouteInfo>? children})
-      : super(name, path: '/', children: children);
-
-  static const String name = 'EmptyRouterRoute';
-}
-
 class WishlistListRoute extends _i1.PageRouteInfo {
-  const WishlistListRoute() : super(name, path: '');
+  const WishlistListRoute() : super(name, path: '/');
 
   static const String name = 'WishlistListRoute';
 }
@@ -59,7 +51,7 @@ class WishlistListRoute extends _i1.PageRouteInfo {
 class WishlistRoute extends _i1.PageRouteInfo<WishlistRouteArgs> {
   WishlistRoute({required String id})
       : super(name,
-            path: 'wishlist/:id',
+            path: '/wishlist/:id',
             args: WishlistRouteArgs(id: id),
             params: {'id': id});
 

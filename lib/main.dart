@@ -32,20 +32,33 @@ class AppState extends ChangeNotifier {
 
 // Declare routing setup
 @MaterialAutoRouter(
-  replaceInRouteName: 'Page,Route',
+  replaceInRouteName: 'Screen,Route',
   routes: <AutoRoute>[
     AutoRoute(
       path: "/",
-      page: EmptyRouterPage,
-      children: [
-        AutoRoute(path: "", page: WishlistListPage),
-        AutoRoute(path: "wishlist/:id", page: WishlistPage),
-      ],
+      page: WishlistListScreen,
+    ),
+    AutoRoute(
+      path: "/wishlist/:id",
+      guards: [CreateIfNotExistGuard],
+      page: WishlistScreen,
     ),
     RedirectRoute(path: "*", redirectTo: "/")
   ],
 )
 class $AppRouter {}
+
+class CreateIfNotExistGuard extends AutoRouteGuard {
+  @override
+  Future<bool> canNavigate(
+      List<PageRouteInfo> pendingRoutes, StackRouter router) async {
+    final id = pendingRoutes.first.params["id"];
+    if (appState.wishlists.indexWhere((element) => element.id == id) == -1) {
+      appState.addWishlist(Wishlist(id));
+    }
+    return true;
+  }
+}
 
 final AppState appState = AppState();
 
@@ -55,22 +68,27 @@ class WishListApp extends StatefulWidget {
 }
 
 class _WishListAppState extends State<WishListApp> {
-  late final _appRouter = AppRouter();
+  late final _appRouter = AppRouter(
+    createIfNotExistGuard: CreateIfNotExistGuard(),
+  );
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      routeInformationParser: _appRouter.defaultRouteParser(),
+      routeInformationParser:
+          // includePrefixMatches can toggle whether the root / route is pushed when you
+          // hit /wishlist/:id directly - typically false for web but true for mobile
+          _appRouter.defaultRouteParser(includePrefixMatches: true),
       routerDelegate: _appRouter.delegate(),
     );
   }
 }
 
-class WishlistListPage extends StatelessWidget {
+class WishlistListScreen extends StatelessWidget {
   void onCreate(BuildContext context, String value) {
     final wishlist = Wishlist(value);
     appState.addWishlist(wishlist);
-    context.router.navigateNamed('/wishlist/$value');
+    context.router.pushNamed('/wishlist/$value');
   }
 
   @override
@@ -100,7 +118,7 @@ class WishlistListPage extends StatelessWidget {
               title: Text('Wishlist ${i + 1}'),
               subtitle: Text(appState.wishlists[i].id),
               onTap: () => context.router
-                  .navigateNamed("/wishlist/${appState.wishlists[i].id}"),
+                  .pushNamed("/wishlist/${appState.wishlists[i].id}"),
             )
         ],
       ),
@@ -108,27 +126,9 @@ class WishlistListPage extends StatelessWidget {
   }
 }
 
-class WishlistPage extends StatefulWidget {
-  WishlistPage({@PathParam('id') required this.id});
+class WishlistScreen extends StatelessWidget {
+  WishlistScreen({@PathParam('id') required this.id});
   final String id;
-
-  @override
-  _WishlistPageState createState() => _WishlistPageState();
-}
-
-class _WishlistPageState extends State<WishlistPage> {
-  @override
-  void initState() {
-    createIfNotExist();
-    super.initState();
-  }
-
-  void createIfNotExist() {
-    if (appState.wishlists.indexWhere((element) => element.id == widget.id) ==
-        -1) {
-      appState.addWishlist(Wishlist(widget.id));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,8 +139,7 @@ class _WishlistPageState extends State<WishlistPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ID: ${widget.id}',
-                style: Theme.of(context).textTheme.headline6),
+            Text('ID: $id', style: Theme.of(context).textTheme.headline6),
           ],
         ),
       ),
