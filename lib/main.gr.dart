@@ -5,59 +5,67 @@
 // **************************************************************************
 
 import 'package:auto_route/auto_route.dart' as _i1;
+import 'package:flutter/material.dart' as _i2;
 
-import 'main.dart' as _i2;
+import 'main.dart' as _i3;
 
 class AppRouter extends _i1.RootStackRouter {
-  AppRouter({required this.signedInGuard, required this.signedOutGuard});
+  AppRouter(
+      {_i2.GlobalKey<_i2.NavigatorState>? navigatorKey,
+      required this.appGuard,
+      required this.signInGuard})
+      : super(navigatorKey);
 
-  final _i2.SignedInGuard signedInGuard;
+  final _i3.AppGuard appGuard;
 
-  final _i2.SignedOutGuard signedOutGuard;
+  final _i3.SignInGuard signInGuard;
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
-    AppStack.name: (entry) {
-      return _i1.MaterialPageX(
-          entry: entry, child: const _i1.EmptyRouterPage());
+    EmptyRouterRoute.name: (routeData) {
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: const _i1.EmptyRouterScreen());
     },
-    SignInRoute.name: (entry) {
-      var args = entry.routeData.argsAs<SignInRouteArgs>();
-      return _i1.MaterialPageX(
-          entry: entry, child: _i2.SignInScreen(onSignedIn: args.onSignedIn));
+    SignInRoute.name: (routeData) {
+      final args = routeData.argsAs<SignInRouteArgs>();
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData,
+          child: _i3.SignInScreen(onSignedIn: args.onSignedIn));
     },
-    HomeRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i2.HomeScreen());
+    HomeRoute.name: (routeData) {
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.HomeScreen());
     },
-    BooksListRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i2.BooksListScreen());
+    BooksListRoute.name: (routeData) {
+      return _i1.MaterialPageX<dynamic>(
+          routeData: routeData, child: _i3.BooksListScreen());
     }
   };
 
   @override
   List<_i1.RouteConfig> get routes => [
-        _i1.RouteConfig(AppStack.name, path: '/', guards: [
-          signedInGuard
+        _i1.RouteConfig(EmptyRouterRoute.name, path: '/', guards: [
+          appGuard
         ], children: [
           _i1.RouteConfig(HomeRoute.name, path: ''),
           _i1.RouteConfig(BooksListRoute.name, path: 'books')
         ]),
         _i1.RouteConfig(SignInRoute.name,
-            path: '/signIn', guards: [signedOutGuard]),
+            path: '/signIn', guards: [signInGuard]),
         _i1.RouteConfig('*#redirect',
             path: '*', redirectTo: '/', fullMatch: true)
       ];
 }
 
-class AppStack extends _i1.PageRouteInfo {
-  const AppStack({List<_i1.PageRouteInfo>? children})
-      : super(name, path: '/', initialChildren: children);
+class EmptyRouterRoute extends _i1.PageRouteInfo {
+  const EmptyRouterRoute({List<_i1.PageRouteInfo>? children})
+      : super(name, path: '/', children: children);
 
-  static const String name = 'AppStack';
+  static const String name = 'EmptyRouterRoute';
 }
 
 class SignInRoute extends _i1.PageRouteInfo<SignInRouteArgs> {
-  SignInRoute({required void Function(_i2.Credentials) onSignedIn})
+  SignInRoute({required void Function(_i3.Credentials) onSignedIn})
       : super(name,
             path: '/signIn', args: SignInRouteArgs(onSignedIn: onSignedIn));
 
@@ -67,7 +75,7 @@ class SignInRoute extends _i1.PageRouteInfo<SignInRouteArgs> {
 class SignInRouteArgs {
   const SignInRouteArgs({required this.onSignedIn});
 
-  final void Function(_i2.Credentials) onSignedIn;
+  final void Function(_i3.Credentials) onSignedIn;
 }
 
 class HomeRoute extends _i1.PageRouteInfo {
