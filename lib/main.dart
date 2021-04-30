@@ -76,8 +76,8 @@ class _WishListAppState extends State<WishListApp> {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routeInformationParser:
-          // includePrefixMatches can toggle whether the root / route is pushed when you
-          // hit /wishlist/:id directly - typically false for web but true for mobile
+          // includePrefixMatches can toggle whether the root / route is also pushed when you
+          // hit /wishlist/:id directly in the browser
           _appRouter.defaultRouteParser(includePrefixMatches: true),
       routerDelegate: _appRouter.delegate(),
     );
