@@ -21,14 +21,15 @@ void main() {
       page: AppPage,
       path: "/",
       children: [
-        AutoRoute(
+        CustomRoute(
           name: "BooksTab",
-          path: 'books',
+          path: 'books/:tab',
           page: BooksPage,
           children: [
             RedirectRoute(path: "", redirectTo: "all"),
             CustomRoute(
-              path: "all",
+              // use CustomRoute so there is no pagetransition
+              path: ":tab",
               page: AllBooksPage,
             ),
             CustomRoute(
