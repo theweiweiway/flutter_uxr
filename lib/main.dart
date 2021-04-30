@@ -29,7 +29,7 @@ void main() {
           children: [
             CustomRoute(path: "new", page: NewBooksScreen),
             CustomRoute(path: "all", page: AllBooksScreen),
-            RedirectRoute(path: "", redirectTo: "new"),
+            RedirectRoute(path: "*", redirectTo: "new"),
           ],
         ),
         AutoRoute(
@@ -113,9 +113,11 @@ class _BooksScreenState extends State<BooksScreen>
       children: [
         TabBar(
           controller: _tabController,
-          onTap: (int index) => setState(() {
-            _tabController.index = index;
-          }),
+          onTap: (int index) => context.router
+              .pushNamed(index == 0 ? "/books/new" : "/books/all"),
+          // onTap: (int index) => setState(() {
+          //   _tabController.index = index;
+          // }),
           labelColor: Theme.of(context).primaryColor,
           tabs: [
             Tab(icon: Icon(Icons.bathtub), text: 'New'),
@@ -123,14 +125,18 @@ class _BooksScreenState extends State<BooksScreen>
           ],
         ),
         Expanded(
-          child: AutoRouter.declarative(
-            routes: (router) {
-              return [
-                if (_tabController.index == 0) NewBooksRoute(),
-                if (_tabController.index == 1) AllBooksRoute(),
-              ];
-            },
-          ),
+          child: AutoRouter(),
+          // child: AutoRouter.declarative(
+          //   routes: (router) {
+          //     return [
+          //       if (_tabController.index == 0) NewBooksRoute(),
+          //       if (_tabController.index == 1) AllBooksRoute(),
+          //     ];
+          //   },
+          //   onPopRoute: (_, __) {
+          //     print('popping');
+          //   },
+          // ),
         ),
       ],
     );

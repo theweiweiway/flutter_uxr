@@ -58,8 +58,8 @@ class AppRouter extends _i1.RootStackRouter {
           _i1.RouteConfig(BooksTab.name, path: 'books', children: [
             _i1.RouteConfig(NewBooksRoute.name, path: 'new'),
             _i1.RouteConfig(AllBooksRoute.name, path: 'all'),
-            _i1.RouteConfig('#redirect',
-                path: '', redirectTo: 'new', fullMatch: true)
+            _i1.RouteConfig('*#redirect',
+                path: '*', redirectTo: 'new', fullMatch: true)
           ]),
           _i1.RouteConfig(SettingsTab.name, path: 'settings')
         ]),
