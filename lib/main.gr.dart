@@ -18,30 +18,33 @@ class AppRouter extends _i1.RootStackRouter {
     AppRoute.name: (routeData) {
       return _i1.CustomPage<dynamic>(
           routeData: routeData,
-          child: _i3.AppPage(),
+          child: _i3.AppScreen(),
           transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
           opaque: true,
           barrierDismissible: false);
     },
     BooksTab.name: (routeData) {
-      return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.BooksPage());
+      return _i1.CustomPage<dynamic>(
+          routeData: routeData,
+          child: _i3.BooksScreen(),
+          opaque: true,
+          barrierDismissible: false);
     },
     SettingsTab.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.SettingsPage());
+          routeData: routeData, child: _i3.SettingsScreen());
     },
     AllBooksRoute.name: (routeData) {
       return _i1.CustomPage<dynamic>(
           routeData: routeData,
-          child: _i3.AllBooksPage(),
+          child: _i3.AllBooksScreen(),
           opaque: true,
           barrierDismissible: false);
     },
     NewBooksRoute.name: (routeData) {
       return _i1.CustomPage<dynamic>(
           routeData: routeData,
-          child: _i3.NewBooksPage(),
+          child: _i3.NewBooksScreen(),
           opaque: true,
           barrierDismissible: false);
     }
@@ -54,7 +57,9 @@ class AppRouter extends _i1.RootStackRouter {
             _i1.RouteConfig('#redirect',
                 path: '', redirectTo: 'all', fullMatch: true),
             _i1.RouteConfig(AllBooksRoute.name, path: 'all'),
-            _i1.RouteConfig(NewBooksRoute.name, path: 'new')
+            _i1.RouteConfig(NewBooksRoute.name, path: 'new'),
+            _i1.RouteConfig('*#redirect',
+                path: '*', redirectTo: '', fullMatch: true)
           ]),
           _i1.RouteConfig(SettingsTab.name, path: 'settings')
         ]),

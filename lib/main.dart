@@ -14,34 +14,34 @@ void main() {
 
 // Declare routing setup
 @MaterialAutoRouter(
-  replaceInRouteName: 'Page,Route',
+  replaceInRouteName: 'Screen,Route',
   routes: <AutoRoute>[
     CustomRoute(
       transitionsBuilder: TransitionsBuilders.fadeIn, // cross fade between tabs
-      page: AppPage,
+      page: AppScreen,
       path: "/",
       children: [
         CustomRoute(
           name: "BooksTab",
-          path: 'books/:tab',
-          page: BooksPage,
+          path: 'books',
+          page: BooksScreen,
           children: [
             RedirectRoute(path: "", redirectTo: "all"),
             CustomRoute(
-              // use CustomRoute so there is no pagetransition
-              path: ":tab",
-              page: AllBooksPage,
+              path: "all",
+              page: AllBooksScreen,
             ),
             CustomRoute(
               path: "new",
-              page: NewBooksPage,
+              page: NewBooksScreen,
             ),
+            RedirectRoute(path: "*", redirectTo: ""),
           ],
         ),
         AutoRoute(
           name: "SettingsTab",
           path: 'settings',
-          page: SettingsPage,
+          page: SettingsScreen,
         ),
       ],
     ),
@@ -62,7 +62,7 @@ class BooksApp extends StatelessWidget {
   }
 }
 
-class AppPage extends StatelessWidget {
+class AppScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AutoTabsScaffold(
@@ -87,12 +87,12 @@ class AppPage extends StatelessWidget {
   }
 }
 
-class BooksPage extends StatefulWidget {
+class BooksScreen extends StatefulWidget {
   @override
-  _BooksPageState createState() => _BooksPageState();
+  _BooksScreenState createState() => _BooksScreenState();
 }
 
-class _BooksPageState extends State<BooksPage>
+class _BooksScreenState extends State<BooksScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
@@ -123,7 +123,6 @@ class _BooksPageState extends State<BooksPage>
           ],
         ),
         Expanded(
-          // DECLARATIVE FTW!!!
           child: AutoRouter.declarative(
             routes: (context) {
               return [
@@ -138,7 +137,7 @@ class _BooksPageState extends State<BooksPage>
   }
 }
 
-class SettingsPage extends StatelessWidget {
+class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,7 +148,7 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class AllBooksPage extends StatelessWidget {
+class AllBooksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,7 +159,7 @@ class AllBooksPage extends StatelessWidget {
   }
 }
 
-class NewBooksPage extends StatelessWidget {
+class NewBooksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
