@@ -23,7 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  auto_route: ^2.0.1
+  auto_route: ^2.0.2
   vrouter: ^1.1.1+2
 
 

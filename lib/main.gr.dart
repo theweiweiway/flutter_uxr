@@ -17,11 +17,11 @@ class AppRouter extends _i1.RootStackRouter {
   final Map<String, _i1.PageFactory> pagesMap = {
     RootRouter.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: const _i1.EmptyRouterPage());
+          routeData: routeData, child: const _i1.EmptyRouterScreen());
     },
     BooksListRoute.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.BooksListPage());
+          routeData: routeData, child: _i3.BooksListScreen());
     },
     BookDetailsRoute.name: (routeData) {
       var pathParams = routeData.pathParams;
@@ -30,11 +30,11 @@ class AppRouter extends _i1.RootStackRouter {
               BookDetailsRouteArgs(bookId: pathParams.getInt('bookId')));
       return _i1.MaterialPageX<dynamic>(
           routeData: routeData,
-          child: _i3.BookDetailsPage(bookId: args.bookId));
+          child: _i3.BookDetailsScreen(bookId: args.bookId));
     },
     AuthorsListRoute.name: (routeData) {
       return _i1.MaterialPageX<dynamic>(
-          routeData: routeData, child: _i3.AuthorsListPage());
+          routeData: routeData, child: _i3.AuthorsListScreen());
     },
     AuthorDetailsRoute.name: (routeData) {
       var pathParams = routeData.pathParams;
@@ -43,22 +43,20 @@ class AppRouter extends _i1.RootStackRouter {
               AuthorDetailsRouteArgs(bookId: pathParams.getInt('bookId')));
       return _i1.MaterialPageX<dynamic>(
           routeData: routeData,
-          child: _i3.AuthorDetailsPage(bookId: args.bookId));
+          child: _i3.AuthorDetailsScreen(bookId: args.bookId));
     }
   };
 
   @override
   List<_i1.RouteConfig> get routes => [
         _i1.RouteConfig(RootRouter.name, path: '/', children: [
-          _i1.RouteConfig('#redirect',
-              path: '', redirectTo: 'books', fullMatch: true),
-          _i1.RouteConfig(BooksListRoute.name, path: 'books'),
+          _i1.RouteConfig(BooksListRoute.name, path: ''),
           _i1.RouteConfig(BookDetailsRoute.name, path: 'book/:bookId'),
           _i1.RouteConfig(AuthorsListRoute.name, path: 'authors'),
           _i1.RouteConfig(AuthorDetailsRoute.name, path: 'author/:bookId')
         ]),
         _i1.RouteConfig('*#redirect',
-            path: '*', redirectTo: '/ ', fullMatch: true)
+            path: '*', redirectTo: '/', fullMatch: true)
       ];
 }
 
@@ -70,7 +68,7 @@ class RootRouter extends _i1.PageRouteInfo {
 }
 
 class BooksListRoute extends _i1.PageRouteInfo {
-  const BooksListRoute() : super(name, path: 'books');
+  const BooksListRoute() : super(name, path: '');
 
   static const String name = 'BooksListRoute';
 }

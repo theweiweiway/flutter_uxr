@@ -37,33 +37,31 @@ class AppState extends ChangeNotifier {
 
 // Declare routing setup
 @MaterialAutoRouter(
-  replaceInRouteName: 'Page,Route',
+  replaceInRouteName: 'Screen,Route',
   routes: <AutoRoute>[
     AutoRoute(
-      name: 'RootRouter',
-      page: EmptyRouterPage,
-      path: "/",
-      children: [
-        RedirectRoute(path: "", redirectTo: "books"),
-        AutoRoute(
-          path: 'books',
-          page: BooksListPage,
-        ),
-        AutoRoute(
-          path: 'book/:bookId',
-          page: BookDetailsPage,
-        ),
-        AutoRoute(
-          path: 'authors',
-          page: AuthorsListPage,
-        ),
-        AutoRoute(
-          path: 'author/:bookId',
-          page: AuthorDetailsPage,
-        ),
-      ],
-    ),
-    RedirectRoute(path: "*", redirectTo: "/ ")
+        path: '/',
+        name: 'RootRouter',
+        page: EmptyRouterScreen,
+        children: [
+          AutoRoute(
+            path: '',
+            page: BooksListScreen,
+          ),
+          AutoRoute(
+            path: 'book/:bookId',
+            page: BookDetailsScreen,
+          ),
+          AutoRoute(
+            path: 'authors',
+            page: AuthorsListScreen,
+          ),
+          AutoRoute(
+            path: 'author/:bookId',
+            page: AuthorDetailsScreen,
+          ),
+        ]),
+    RedirectRoute(path: "*", redirectTo: "/")
   ],
 )
 class $AppRouter {}
@@ -82,7 +80,7 @@ class BooksApp extends StatelessWidget {
   }
 }
 
-class BooksListPage extends StatelessWidget {
+class BooksListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final books = appState.books;
@@ -94,8 +92,8 @@ class BooksListPage extends StatelessWidget {
             ListTile(
               title: Text(book.title),
               subtitle: Text(book.author.name),
-              onTap: () =>
-                  context.router.pushNamed('/book/${books.indexOf(book)}'),
+              onTap: () => context.router
+                  .push(BookDetailsRoute(bookId: books.indexOf(book))),
             )
         ],
       ),
@@ -103,7 +101,7 @@ class BooksListPage extends StatelessWidget {
   }
 }
 
-class AuthorsListPage extends StatelessWidget {
+class AuthorsListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authors = appState.authors;
@@ -112,14 +110,14 @@ class AuthorsListPage extends StatelessWidget {
       body: ListView(
         children: [
           ElevatedButton(
-            onPressed: () => context.router.pushNamed('/'),
+            onPressed: () => context.router.push(BooksListRoute()),
             child: Text('Go to Books Page'),
           ),
           for (var author in authors)
             ListTile(
               title: Text(author.name),
               onTap: () => context.router
-                  .pushNamed('/author/${authors.indexOf(author)}'),
+                  .push(AuthorDetailsRoute(bookId: authors.indexOf(author))),
             )
         ],
       ),
@@ -127,10 +125,10 @@ class AuthorsListPage extends StatelessWidget {
   }
 }
 
-class BookDetailsPage extends StatelessWidget {
+class BookDetailsScreen extends StatelessWidget {
   final int bookId;
 
-  BookDetailsPage({@PathParam('bookId') required this.bookId});
+  BookDetailsScreen({@PathParam('bookId') required this.bookId});
 
   @override
   Widget build(BuildContext context) {
@@ -158,10 +156,10 @@ class BookDetailsPage extends StatelessWidget {
   }
 }
 
-class AuthorDetailsPage extends StatelessWidget {
+class AuthorDetailsScreen extends StatelessWidget {
   final int bookId;
 
-  AuthorDetailsPage({@PathParam('bookId') required this.bookId});
+  AuthorDetailsScreen({@PathParam('bookId') required this.bookId});
 
   @override
   Widget build(BuildContext context) {
@@ -227,7 +225,7 @@ class AuthorDetailsPage extends StatelessWidget {
 //         // Books
 //         VWidget(
 //           path: '/',
-//           widget: BooksListPage(books: _appState.books),
+//           widget: BooksListScreen(books: _appState.books),
 //           stackedRoutes: [
 //             VWidget(
 //               path: r'book/:bookId(\d+)',
@@ -235,7 +233,7 @@ class AuthorDetailsPage extends StatelessWidget {
 //                 builder: (context) {
 //                   final bookId =
 //                       int.parse(context.vRouter.pathParameters['bookId']!);
-//                   return BookDetailsPage(
+//                   return BookDetailsScreen(
 //                     book: _appState.books[bookId],
 //                   );
 //                 },
@@ -247,7 +245,7 @@ class AuthorDetailsPage extends StatelessWidget {
 //         // Authors
 //         VWidget(
 //           path: '/authors',
-//           widget: AuthorsListPage(authors: _appState.authors),
+//           widget: AuthorsListScreen(authors: _appState.authors),
 //           stackedRoutes: [
 //             VWidget(
 //               path: r'/author/:bookId(\d+)',
@@ -255,7 +253,7 @@ class AuthorDetailsPage extends StatelessWidget {
 //                 builder: (context) {
 //                   final bookId =
 //                       int.parse(context.vRouter.pathParameters['bookId']!);
-//                   return AuthorDetailsPage(
+//                   return AuthorDetailsScreen(
 //                     author: _appState.books[bookId].author,
 //                   );
 //                 },
@@ -271,10 +269,10 @@ class AuthorDetailsPage extends StatelessWidget {
 //   }
 // }
 
-// class BooksListPage extends StatelessWidget {
+// class BooksListScreen extends StatelessWidget {
 //   final List<Book> books;
 
-//   BooksListPage({required this.books});
+//   BooksListScreen({required this.books});
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -294,10 +292,10 @@ class AuthorDetailsPage extends StatelessWidget {
 //   }
 // }
 
-// class AuthorsListPage extends StatelessWidget {
+// class AuthorsListScreen extends StatelessWidget {
 //   final List<Author> authors;
 
-//   AuthorsListPage({required this.authors});
+//   AuthorsListScreen({required this.authors});
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -321,10 +319,10 @@ class AuthorDetailsPage extends StatelessWidget {
 //   }
 // }
 
-// class BookDetailsPage extends StatelessWidget {
+// class BookDetailsScreen extends StatelessWidget {
 //   final Book book;
 
-//   BookDetailsPage({required this.book});
+//   BookDetailsScreen({required this.book});
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -348,10 +346,10 @@ class AuthorDetailsPage extends StatelessWidget {
 //   }
 // }
 
-// class AuthorDetailsPage extends StatelessWidget {
+// class AuthorDetailsScreen extends StatelessWidget {
 //   final Author author;
 
-//   AuthorDetailsPage({
+//   AuthorDetailsScreen({
 //     required this.author,
 //   });
 
