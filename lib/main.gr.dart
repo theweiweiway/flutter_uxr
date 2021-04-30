@@ -34,17 +34,17 @@ class AppRouter extends _i1.RootStackRouter {
       return _i1.MaterialPageX<dynamic>(
           routeData: routeData, child: _i3.SettingsScreen());
     },
-    AllBooksRoute.name: (routeData) {
-      return _i1.CustomPage<dynamic>(
-          routeData: routeData,
-          child: _i3.AllBooksScreen(),
-          opaque: true,
-          barrierDismissible: false);
-    },
     NewBooksRoute.name: (routeData) {
       return _i1.CustomPage<dynamic>(
           routeData: routeData,
           child: _i3.NewBooksScreen(),
+          opaque: true,
+          barrierDismissible: false);
+    },
+    AllBooksRoute.name: (routeData) {
+      return _i1.CustomPage<dynamic>(
+          routeData: routeData,
+          child: _i3.AllBooksScreen(),
           opaque: true,
           barrierDismissible: false);
     }
@@ -53,13 +53,13 @@ class AppRouter extends _i1.RootStackRouter {
   @override
   List<_i1.RouteConfig> get routes => [
         _i1.RouteConfig(AppRoute.name, path: '/', children: [
+          _i1.RouteConfig('#redirect',
+              path: '', redirectTo: 'books/new', fullMatch: true),
           _i1.RouteConfig(BooksTab.name, path: 'books', children: [
-            _i1.RouteConfig('#redirect',
-                path: '', redirectTo: 'all', fullMatch: true),
-            _i1.RouteConfig(AllBooksRoute.name, path: 'all'),
             _i1.RouteConfig(NewBooksRoute.name, path: 'new'),
-            _i1.RouteConfig('*#redirect',
-                path: '*', redirectTo: '', fullMatch: true)
+            _i1.RouteConfig(AllBooksRoute.name, path: 'all'),
+            _i1.RouteConfig('#redirect',
+                path: '', redirectTo: 'new', fullMatch: true)
           ]),
           _i1.RouteConfig(SettingsTab.name, path: 'settings')
         ]),
@@ -88,14 +88,14 @@ class SettingsTab extends _i1.PageRouteInfo {
   static const String name = 'SettingsTab';
 }
 
-class AllBooksRoute extends _i1.PageRouteInfo {
-  const AllBooksRoute() : super(name, path: 'all');
-
-  static const String name = 'AllBooksRoute';
-}
-
 class NewBooksRoute extends _i1.PageRouteInfo {
   const NewBooksRoute() : super(name, path: 'new');
 
   static const String name = 'NewBooksRoute';
+}
+
+class AllBooksRoute extends _i1.PageRouteInfo {
+  const AllBooksRoute() : super(name, path: 'all');
+
+  static const String name = 'AllBooksRoute';
 }

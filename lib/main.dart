@@ -21,21 +21,15 @@ void main() {
       page: AppScreen,
       path: "/",
       children: [
+        RedirectRoute(path: "", redirectTo: "books/new"),
         CustomRoute(
-          name: "BooksTab",
+          name: 'BooksTab',
           path: 'books',
           page: BooksScreen,
           children: [
-            RedirectRoute(path: "", redirectTo: "all"),
-            CustomRoute(
-              path: "all",
-              page: AllBooksScreen,
-            ),
-            CustomRoute(
-              path: "new",
-              page: NewBooksScreen,
-            ),
-            RedirectRoute(path: "*", redirectTo: ""),
+            CustomRoute(path: "new", page: NewBooksScreen),
+            CustomRoute(path: "all", page: AllBooksScreen),
+            RedirectRoute(path: "", redirectTo: "new"),
           ],
         ),
         AutoRoute(
@@ -98,7 +92,13 @@ class _BooksScreenState extends State<BooksScreen>
 
   @override
   void initState() {
-    _tabController = TabController(length: 2, vsync: this, initialIndex: 1);
+    var url;
+    Future.delayed(Duration.zero, () {
+      url = AutoRouterDelegate.of(context).urlState.path;
+    });
+    _tabController = TabController(
+        length: 2, vsync: this, initialIndex: url == "/books/new" ? 0 : 1);
+
     super.initState();
   }
 
@@ -124,7 +124,7 @@ class _BooksScreenState extends State<BooksScreen>
         ),
         Expanded(
           child: AutoRouter.declarative(
-            routes: (context) {
+            routes: (router) {
               return [
                 if (_tabController.index == 0) NewBooksRoute(),
                 if (_tabController.index == 1) AllBooksRoute(),
