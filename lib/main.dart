@@ -86,7 +86,8 @@ class BooksScreen extends StatefulWidget {
   _BooksScreenState createState() => _BooksScreenState();
 }
 
-class _BooksScreenState extends State<BooksScreen> with SingleTickerProviderStateMixin {
+class _BooksScreenState extends State<BooksScreen>
+    with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final _tabs = const ['new', 'all'];
 
@@ -120,13 +121,11 @@ class _BooksScreenState extends State<BooksScreen> with SingleTickerProviderStat
         TabBar(
           controller: _tabController,
           onTap: (int index) {
-            final destination = '/books/${_tabs.elementAt(index)}';
-            context.router.navigateNamed(destination);
-            // context.navigateTo(AppRoute(
-            //   children: [
-            //     BooksRoute(tab: _tabs.elementAt(index)),
-            //   ],
-            // ));
+            context.navigateTo(AppRoute(
+              children: [
+                BooksRoute(tab: _tabs.elementAt(index)),
+              ],
+            ));
           },
           labelColor: Theme.of(context).primaryColor,
           tabs: [
