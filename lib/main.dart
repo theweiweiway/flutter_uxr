@@ -86,8 +86,8 @@ class BooksListScreen extends StatelessWidget {
             ListTile(
               title: Text(book.title),
               subtitle: Text(book.author.name),
-              onTap: () =>
-                  context.router.pushNamed("/book/${books.indexOf(book)}"),
+              onTap: () => context.router
+                  .push(BookDetailsRoute(bookId: books.indexOf(book))),
             )
         ],
       ),
@@ -104,14 +104,14 @@ class AuthorsListScreen extends StatelessWidget {
       body: ListView(
         children: [
           ElevatedButton(
-            onPressed: () => context.router.pushNamed("/"),
+            onPressed: () => context.router.push(BooksListRoute()),
             child: Text('Go to Books Page'),
           ),
           for (var author in authors)
             ListTile(
               title: Text(author.name),
               onTap: () => context.router
-                  .pushNamed("/author/${authors.indexOf(author)}"),
+                  .push(AuthorDetailsRoute(bookId: authors.indexOf(author))),
             )
         ],
       ),
