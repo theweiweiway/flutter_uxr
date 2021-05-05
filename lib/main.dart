@@ -4,9 +4,11 @@
 
 /// Nested example
 /// Done using AutoRoute
-import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_uxr/main.gr.dart';
+
+import 'main.gr.dart';
 
 void main() {
   runApp(BooksApp());
@@ -16,27 +18,13 @@ void main() {
 @MaterialAutoRouter(
   replaceInRouteName: 'Screen,Route',
   routes: <AutoRoute>[
-    CustomRoute(
-      transitionsBuilder: TransitionsBuilders.fadeIn, // cross fade between tabs
+    AutoRoute(
       page: AppScreen,
       path: "/",
       children: [
         RedirectRoute(path: "", redirectTo: "books/new"),
-        CustomRoute(
-          name: 'BooksTab',
-          path: 'books',
-          page: BooksScreen,
-          children: [
-            CustomRoute(path: "new", page: NewBooksScreen),
-            CustomRoute(path: "all", page: AllBooksScreen),
-            RedirectRoute(path: "*", redirectTo: "new"),
-          ],
-        ),
-        AutoRoute(
-          name: "SettingsTab",
-          path: 'settings',
-          page: SettingsScreen,
-        ),
+        AutoRoute(path: 'books/:tab', page: BooksScreen),
+        AutoRoute(path: 'settings', page: SettingsScreen),
       ],
     ),
     RedirectRoute(path: "*", redirectTo: "/")
@@ -60,11 +48,16 @@ class AppScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AutoTabsScaffold(
-      routes: [BooksTab(), SettingsTab()],
+      routes: [BooksRoute(), SettingsRoute()],
+      // transition between bottom nav tabs
+      builder: (_, child, animation) => FadeTransition(
+        opacity: animation,
+        child: child,
+      ),
       bottomNavigationBuilder: (_, tabsRouter) {
         return BottomNavigationBar(
           currentIndex: tabsRouter.activeIndex,
-          onTap: (idx) => tabsRouter.setActiveIndex(idx),
+          onTap: tabsRouter.setActiveIndex,
           items: [
             BottomNavigationBarItem(
               label: 'Books',
@@ -82,24 +75,37 @@ class AppScreen extends StatelessWidget {
 }
 
 class BooksScreen extends StatefulWidget {
+  final String tab;
+
+  const BooksScreen({
+    Key? key,
+    @pathParam this.tab = 'new',
+  }) : super(key: key);
+
   @override
   _BooksScreenState createState() => _BooksScreenState();
 }
 
-class _BooksScreenState extends State<BooksScreen>
-    with SingleTickerProviderStateMixin {
+class _BooksScreenState extends State<BooksScreen> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  late final _tabs = const ['new', 'all'];
 
   @override
   void initState() {
-    var url;
-    Future.delayed(Duration.zero, () {
-      url = AutoRouterDelegate.of(context).urlState.path;
-    });
     _tabController = TabController(
-        length: 2, vsync: this, initialIndex: url == "/books/new" ? 0 : 1);
-
+      length: 2,
+      vsync: this,
+      initialIndex: _tabs.indexOf(widget.tab),
+    );
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant BooksScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tab != widget.tab) {
+      _tabController.index = _tabs.indexOf(widget.tab);
+    }
   }
 
   void dispose() {
@@ -113,11 +119,15 @@ class _BooksScreenState extends State<BooksScreen>
       children: [
         TabBar(
           controller: _tabController,
-          onTap: (int index) => context.router
-              .pushNamed(index == 0 ? "/books/new" : "/books/all"),
-          // onTap: (int index) => setState(() {
-          //   _tabController.index = index;
-          // }),
+          onTap: (int index) {
+            final destination = '/books/${_tabs.elementAt(index)}';
+            context.router.navigateNamed(destination);
+            // context.navigateTo(AppRoute(
+            //   children: [
+            //     BooksRoute(tab: _tabs.elementAt(index)),
+            //   ],
+            // ));
+          },
           labelColor: Theme.of(context).primaryColor,
           tabs: [
             Tab(icon: Icon(Icons.bathtub), text: 'New'),
@@ -125,18 +135,13 @@ class _BooksScreenState extends State<BooksScreen>
           ],
         ),
         Expanded(
-          child: AutoRouter(),
-          // child: AutoRouter.declarative(
-          //   routes: (router) {
-          //     return [
-          //       if (_tabController.index == 0) NewBooksRoute(),
-          //       if (_tabController.index == 1) AllBooksRoute(),
-          //     ];
-          //   },
-          //   onPopRoute: (_, __) {
-          //     print('popping');
-          //   },
-          // ),
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              NewBooksScreen(),
+              AllBooksScreen(),
+            ],
+          ),
         ),
       ],
     );
