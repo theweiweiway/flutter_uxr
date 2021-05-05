@@ -49,7 +49,7 @@ class BooksApp extends StatelessWidget {
 
 class BooksListScreen extends StatelessWidget {
   final String? filter;
-  BooksListScreen({@QueryParam('filter') this.filter});
+  BooksListScreen({@queryParam this.filter});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class BooksListScreen extends StatelessWidget {
               hintText: 'filter',
             ),
             onSubmitted: (value) =>
-                context.router.replace(BooksListRoute(filter: value)),
+                context.navigateTo(BooksListRoute(filter: value)),
           ),
           for (var book in books)
             if (filter == null || book.title.toLowerCase().contains(filter!))
