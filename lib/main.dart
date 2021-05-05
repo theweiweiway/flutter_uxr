@@ -2,19 +2,13 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-// Copyright 2021, the Flutter project authors. Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
+// Auth example
+// Done using AutoRoute
 
 import 'package:auto_route/auto_route.dart';
 
-// Deeplink path parameters example
-// Done using AutoRoute
 import 'package:flutter/material.dart';
 import 'package:flutter_uxr/main.gr.dart';
-
-import 'main.gr.dart';
-import 'main.gr.dart';
 
 void main() {
   runApp(BooksApp());
@@ -202,7 +196,8 @@ class _SignInScreenState extends State<SignInScreen> {
               onChanged: (s) => _password = s,
             ),
             ElevatedButton(
-              onPressed: () => widget.onSignedIn(Credentials(_username, _password)),
+              onPressed: () =>
+                  widget.onSignedIn(Credentials(_username, _password)),
               child: Text('Sign in'),
             ),
           ],
