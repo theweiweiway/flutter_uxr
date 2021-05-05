@@ -15,10 +15,10 @@ class AppRouter extends _i1.RootStackRouter {
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
-    AppRouterRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+    AppStackRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return _i3.AppRouterScreen();
+          return _i3.AppStackScreen();
         }),
     SignInRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
         routeData: routeData,
@@ -40,7 +40,7 @@ class AppRouter extends _i1.RootStackRouter {
 
   @override
   List<_i1.RouteConfig> get routes => [
-        _i1.RouteConfig(AppRouterRoute.name, path: '/', children: [
+        _i1.RouteConfig(AppStackRoute.name, path: '/', children: [
           _i1.RouteConfig(HomeRoute.name, path: ''),
           _i1.RouteConfig(BooksListRoute.name, path: 'books')
         ]),
@@ -50,11 +50,11 @@ class AppRouter extends _i1.RootStackRouter {
       ];
 }
 
-class AppRouterRoute extends _i1.PageRouteInfo {
-  const AppRouterRoute({List<_i1.PageRouteInfo>? children})
+class AppStackRoute extends _i1.PageRouteInfo {
+  const AppStackRoute({List<_i1.PageRouteInfo>? children})
       : super(name, path: '/', initialChildren: children);
 
-  static const String name = 'AppRouterRoute';
+  static const String name = 'AppStackRoute';
 }
 
 class SignInRoute extends _i1.PageRouteInfo<SignInRouteArgs> {

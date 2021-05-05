@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_uxr/main.gr.dart';
 
 import 'main.gr.dart';
+import 'main.gr.dart';
 
 void main() {
   runApp(BooksApp());
@@ -88,7 +89,7 @@ class AppState extends ChangeNotifier {
   routes: <AutoRoute>[
     AutoRoute(
       path: "/",
-      page: AppRouterScreen,
+      page: AppStackScreen,
       children: [
         AutoRoute(path: "", page: HomeScreen),
         AutoRoute(path: "books", page: BooksListScreen),
@@ -123,7 +124,7 @@ class _BooksAppState extends State<BooksApp> {
         _appRouter,
         routes: (_) => [
           if (appState.isSignedIn)
-            AppRouterRoute()
+            AppStackRoute()
           else
             SignInRoute(
               onSignedIn: _handleSignedIn,
@@ -141,7 +142,7 @@ class _BooksAppState extends State<BooksApp> {
 
 // can be replaced with the shipped in widget
 // EmptyRouterWidget
-class AppRouterScreen extends StatelessWidget {
+class AppStackScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AutoRouter();
