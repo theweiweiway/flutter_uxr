@@ -109,14 +109,19 @@ class _BooksAppState extends State<BooksApp> {
     return MaterialApp.router(
       routerDelegate: AutoRouterDelegate.declarative(
         _appRouter,
-        routes: (_) => [
-          if (appState.isSignedIn)
-            AppStackRoute()
-          else
-            SignInRoute(
-              onSignedIn: _handleSignedIn,
-            ),
-        ],
+        routes: (context) {
+          print(AutoRouterDelegate.of(context).urlState.path);
+          return [
+            if (AutoRouterDelegate.of(context).urlState.path.contains('books'))
+              AppStackRoute(children: [BooksListRoute()])
+            else if (appState.isSignedIn)
+              AppStackRoute()
+            else
+              SignInRoute(
+                onSignedIn: _handleSignedIn,
+              ),
+          ];
+        },
       ),
       routeInformationParser: _appRouter.defaultRouteParser(),
     );
